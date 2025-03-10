@@ -28,7 +28,7 @@ export const setupServer = () => {
     res.json({ message: 'Hello World!' });
   });
 
-  app.use(contactsRouter);
+  app.use('/contacts', contactsRouter);
 
   app.use(notFoundHandler);
 

@@ -48,7 +48,7 @@ export const deleteContactController = async (req, res, next) => {
 
   if (!contact) throw createHttpError(404, 'Contact not found!');
 
-  res.status(204).send();
+  res.sendStatus(204);
 };
 
 const handleContactUpdate = async (req, res, next, upsert = false) => {
