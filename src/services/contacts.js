@@ -9,8 +9,8 @@ export const getAllContacts = async ({
   sortBy = 'name',
   filter = {},
 }) => {
-  const limit = perPage;
-  const skip = (page - 1) * perPage;
+  const limit = perPage > 0 ? perPage : 0;
+  const skip = page > 0 ? (page - 1) * perPage : 0;
 
   const contactsQuery = ContactsCollection.find();
 
