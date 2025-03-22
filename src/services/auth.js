@@ -19,7 +19,7 @@ export const registerUser = async (payload) => {
 };
 
 export const loginUser = async (payload) => {
-  const user = UsersCollection.findOne({ email: payload.email });
+  const user = await UsersCollection.findOne({ email: payload.email });
 
   if (!user) throw createHttpError(401, 'User not authorized!');
 
