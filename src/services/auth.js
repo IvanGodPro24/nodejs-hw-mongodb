@@ -8,7 +8,7 @@ import { FIFTEEN_MINUTES, ONE_MONTH } from '../constants/index.js';
 export const registerUser = async (payload) => {
   const user = UsersCollection.findOne({ email: payload.email });
 
-  if (!user) throw createHttpError(409, 'Email in use');
+  if (user) throw createHttpError(409, 'Email in use');
 
   const encryptedPassword = await bcrypt.hash(payload.password, 10);
 

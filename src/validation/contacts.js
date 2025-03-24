@@ -7,14 +7,12 @@ export const createContactSchema = Joi.object({
   email: Joi.string().email(),
   isFavourite: Joi.boolean(),
   contactType: Joi.string().valid('work', 'home', 'personal').required(),
-  userId: Joi.string()
-    .required()
-    .custom((value, helper) => {
-      if (!isValidObjectId(value))
-        return helper.message('Parent id should be a valid mongo id');
+  userId: Joi.string().custom((value, helper) => {
+    if (!isValidObjectId(value))
+      return helper.message('Parent id should be a valid mongo id');
 
-      return true;
-    }),
+    return true;
+  }),
 });
 
 export const updateContactSchema = Joi.object({
