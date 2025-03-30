@@ -9,6 +9,9 @@ import {
 import { parsePaginationParams } from '../utils/parsePaginationParams.js';
 import { parseSortParams } from '../utils/parseSortParams.js';
 import { parseFilterParams } from '../utils/parseFilterParams.js';
+import { saveFileToUploadDir } from '../utils/saveFileToUploadDir.js';
+import { saveFileToCloudinary } from '../utils/SaveFileToCloudinary.js';
+import { getEnvVar } from '../utils/getEnvVar.js';
 
 export const getContactsController = async (req, res) => {
   const { page, perPage } = parsePaginationParams(req.query);
@@ -48,6 +51,10 @@ export const getContactByIdController = async (req, res) => {
 export const createContactController = async (req, res) => {
   const contact = await createContact({
     userId: req.user._id,
+    photo:
+      getEnvVar('ENABLE_CLOUDINARY') === 'true'
+        ? await saveFileToCloudinary(req.file)
+        : await saveFileToUploadDir(req.file),
     ...req.body,
   });
 
@@ -71,7 +78,16 @@ export const deleteContactController = async (req, res) => {
 const handleContactUpdate = async (req, res, next, upsert = false) => {
   const { contactId } = req.params;
 
-  const result = await updateContact(contactId, req.user._id, req.body, {
+  const payload = { ...req.body };
+
+  if (req.file) {
+    payload.photo =
+      getEnvVar('ENABLE_CLOUDINARY') === 'true'
+        ? await saveFileToCloudinary(req.file)
+        : await saveFileToUploadDir(req.file);
+  }
+
+  const result = await updateContact(contactId, req.user._id, payload, {
     upsert,
   });
 
