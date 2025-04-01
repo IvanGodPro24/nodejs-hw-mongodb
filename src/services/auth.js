@@ -10,6 +10,7 @@ import { SessionsCollection } from '../db/models/session.js';
 import { FIFTEEN_MINUTES, ONE_MONTH } from '../constants/index.js';
 import { sendEmail } from '../utils/sendEmail.js';
 import { getEnvVar } from '../utils/getEnvVar.js';
+import { getFullName, getTicket } from '../utils/googleAuth.js';
 
 export const registerUser = async (payload) => {
   const user = await UsersCollection.findOne({ email: payload.email });
@@ -146,4 +147,32 @@ export const resetPassword = async (token, newPassword) => {
 
     throw error;
   }
+};
+
+export const loginWithGoogle = async (code) => {
+  const loginTicket = await getTicket(code);
+
+  const payload = loginTicket.getPayload();
+
+  if (!payload) throw createHttpError(401, 'Unauthorized');
+
+  let user = await UsersCollection.findOne({ email: payload.email });
+
+  if (!user) {
+    const password = await bcrypt.hash(randomBytes(10), 10);
+
+    user = await UsersCollection.create({
+      name: getFullName(payload),
+      email: payload.email,
+      password,
+      role: 'parent',
+    });
+  }
+
+  const newSession = createSession();
+
+  return await SessionsCollection.create({
+    userId: user._id,
+    ...newSession,
+  });
 };
