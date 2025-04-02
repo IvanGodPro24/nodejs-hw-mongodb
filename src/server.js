@@ -7,6 +7,7 @@ import { notFoundHandler } from './middlewares/notFoundHandler.js';
 import cookieParser from 'cookie-parser';
 import router from './routes/index.js';
 import { getEnvVar } from './utils/getEnvVar.js';
+import { swaggerDocs } from './middlewares/swaggerDocs.js';
 
 const PORT = Number(getEnvVar('PORT', '3000'));
 
@@ -17,6 +18,7 @@ export const setupServer = () => {
   app.use(express.json());
   app.use(cookieParser());
   app.use('/uploads', express.static(path.resolve('src', 'uploads')));
+  app.use('/api-docs', swaggerDocs());
 
   app.use(
     pino({
